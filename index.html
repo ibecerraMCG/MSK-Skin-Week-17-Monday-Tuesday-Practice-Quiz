@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 17 Monday & Tuesday Practice Quiz</title>
+    <style>
+        /* --- Color Variables --- */
+        :root {
+            /* Default: Dark Theme */
+            --bg-color: #2d343e;
+            /* Dark background */
+            --container-bg: #3c424f;
+            /* Slightly lighter container */
+            --text-color: #e8e6e3;
+            /* Light text */
+            --question-text-color: #8ab4f8;
+            /* Light blue for questions */
+            --lo-text-color: #b0c4de;
+            /* Lighter blue for learning objective */
+            --border-color: #555;
+            /* Darker borders */
+            --separator-color: #4a4f5a;
+            --label-bg: #454c5a;
+            --label-border: #6c757d;
+            --label-hover-bg: #525966;
+            --label-hover-border: #7a828a;
+            --button-bg: #8ab4f8;
+            --button-text: #202124;
+            --button-hover-bg: #a3c5f9;
+            --button-disabled-bg: #5f6368;
+            --feedback-correct-bg: #344e41;
+            --feedback-correct-text: #c7f9cc;
+            --feedback-correct-border: #52b788;
+            --feedback-incorrect-bg: #5e2129;
+            --feedback-incorrect-text: #f8d7da;
+            --feedback-incorrect-border: #a4133c;
+            --feedback-rationale-text: #adb5bd;
+            /* Lighter gray for rationale */
+            --feedback-source-text: #c7d3e0;
+            --feedback-separator: #6c757d;
+            --radio-accent: #8ab4f8;
+        }
+
+        .light-theme {
+            --bg-color: #eef2f7;
+            --container-bg: #ffffff;
+            --text-color: #343a40;
+            --question-text-color: #0056b3;
+            --lo-text-color: #5a6e8a;
+            --border-color: #dee2e6;
+            --separator-color: #e9ecef;
+            --label-bg: #f8f9fa;
+            --label-border: #ced4da;
+            --label-hover-bg: #e2e6ea;
+            --label-hover-border: #adb5bd;
+            --button-bg: #007bff;
+            --button-text: white;
+            --button-hover-bg: #0056b3;
+            --button-disabled-bg: #6c757d;
+            --feedback-correct-bg: #d1e7dd;
+            --feedback-correct-text: #0f5132;
+            --feedback-correct-border: #badbcc;
+            --feedback-incorrect-bg: #f8d7da;
+            --feedback-incorrect-text: #842029;
+            --feedback-incorrect-border: #f5c2c7;
+            --feedback-rationale-text: #495057;
+            --feedback-source-text: #343a40;
+            --feedback-separator: #ccc;
+            --radio-accent: #007bff;
+        }
+
+        /* --- General Styles --- */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            line-height: 1.7;
+            margin: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding-bottom: 40px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        #theme-toggle-button {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            padding: 8px 12px;
+            background-color: var(--button-bg);
+            color: var(--button-text);
+            border: 1px solid var(--label-border);
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            z-index: 1000;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        #theme-toggle-button:hover {
+            opacity: 0.8;
+        }
+
+        #quiz-container {
+            max-width: 900px;
+            margin: 80px auto 30px auto;
+            background: var(--container-bg);
+            padding: 25px 35px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--border-color);
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .question-block {
+            margin-bottom: 35px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid var(--separator-color);
+            transition: border-color 0.3s;
+        }
+
+        .question-block:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 5px;
+        }
+
+        .learning-objective {
+            font-size: 0.85em;
+            font-style: italic;
+            color: var(--lo-text-color);
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed var(--separator-color);
+        }
+
+        .question-text {
+            font-weight: 600;
+            font-size: 1.1em;
+            margin-bottom: 18px;
+            color: var(--question-text-color);
+            transition: color 0.3s;
+        }
+
+        .options label {
+            display: block;
+            margin-bottom: 12px;
+            cursor: pointer;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid var(--label-border);
+            background-color: var(--label-bg);
+            transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+        }
+
+        .options label:hover {
+            background-color: var(--label-hover-bg);
+            border-color: var(--label-hover-border);
+        }
+
+        .options input[type="radio"]:checked+span {
+            font-weight: bold;
+            color: var(--question-text-color);
+        }
+
+        .options input[type="radio"] {
+            margin-right: 12px;
+            accent-color: var(--radio-accent);
+        }
+
+        .button-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .check-button {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.95em;
+            transition: background-color 0.2s, color 0.2s, opacity 0.2s;
+            background-color: var(--button-bg);
+            color: var(--button-text);
+        }
+
+        .check-button:hover {
+            opacity: 0.85;
+        }
+
+        .check-button:disabled {
+            background-color: var(--button-disabled-bg);
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 6px;
+            font-size: 0.95em;
+            display: none;
+            border: 1px solid transparent;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+        }
+
+        .feedback.correct {
+            background-color: var(--feedback-correct-bg);
+            color: var(--feedback-correct-text);
+            border-color: var(--feedback-correct-border);
+            display: block;
+        }
+
+        .feedback.incorrect {
+            background-color: var(--feedback-incorrect-bg);
+            color: var(--feedback-incorrect-text);
+            border-color: var(--feedback-incorrect-border);
+            display: block;
+        }
+
+        .feedback-status {
+            font-weight: bold;
+            font-size: 1.1em;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .feedback-rationale {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed var(--feedback-separator);
+            font-size: 0.9em;
+            color: var(--feedback-rationale-text);
+            transition: color 0.3s, border-color 0.3s;
+        }
+
+        .feedback-source {
+            margin-top: 10px;
+            font-size: 0.85em;
+            font-style: italic;
+            color: var(--feedback-source-text);
+            background-color: rgba(0, 0, 0, 0.1);
+            padding: 8px;
+            border-radius: 4px;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--question-text-color);
+            margin-top: 30px;
+            margin-bottom: 30px;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <button id="theme-toggle-button">Toggle Theme</button>
+    <h1>Week 17 Monday & Tuesday Practice Quiz</h1>
+    <div id="quiz-container">
+        <!-- Questions will be loaded here by JavaScript -->
+    </div>
+    <script>
+        const quizData = [
+            // Soft Tissue Tumors
+            {
+                learningObjective: "LO 1 (Soft Tissue Tumors): Review the basic classification (WHO 2020) of soft tissue tumors.",
+                question: "A pathologist is examining a resected mass from a patient's thigh. The tumor is composed of malignant cells showing differentiation towards smooth muscle. According to the WHO 2020 classification system, which lineage of differentiation does this tumor belong to?",
+                options: { A: "Lipogenic", B: "Fibrogenic", C: "Myogenic", D: "Uncertain differentiation" },
+                correctAnswer: "C",
+                rationale: "The WHO 2020 classification for soft tissue tumors is based on the lineage of differentiation. Tumors showing smooth muscle characteristics, such as a leiomyosarcoma, are classified under the myogenic lineage.",
+                source: "\"WHO 2020 Classification based on lineage of differentiation: ... Smooth muscle Leiomyoma Leiomyosarcoma\" (Soft Tissue Tumors, Slide 7)"
+            },
+            {
+                learningObjective: "LO 1 (Soft Tissue Tumors): Review the basic classification (WHO 2020) of soft tissue tumors.",
+                question: "A 55-year-old male presents with a large, deep mass in his retroperitoneum. A biopsy is performed, and the pathology report describes a malignant tumor with adipocytic differentiation. Based on the WHO 2020 classification, this tumor would be categorized as which of the following?",
+                options: { A: "Fibrosarcoma", B: "Rhabdomyosarcoma", C: "Leiomyosarcoma", D: "Liposarcoma" },
+                correctAnswer: "D",
+                rationale: "Liposarcoma is a malignant tumor of adipose (fat) tissue. According to the WHO classification based on cell lineage, a malignant tumor with adipocytic differentiation falls under the lipogenic category.",
+                source: "\"WHO 2020 Classification based on lineage of differentiation: ... Adipose Lipoma Liposarcoma\" (Soft Tissue Tumors, Slide 7)"
+            },
+            {
+                learningObjective: "LO 1 (Soft Tissue Tumors): Review the basic classification (WHO 2020) of soft tissue tumors.",
+                question: "A 22-year-old woman presents with a firm, infiltrative mass in her abdominal wall that has been slowly enlarging since she gave birth one year ago. The mass is composed of benign-appearing fibroblasts that infiltrate the surrounding muscle. The lesion is known for local recurrence but does not metastasize. How would this tumor be classified according to the WHO 2020 system?",
+                options: { A: "Benign", B: "Intermediate (Locally aggressive)", C: "Malignant", D: "Uncertain" },
+                correctAnswer: "B",
+                rationale: "Fibromatosis (desmoid tumor) is characterized by benign fibroblastic proliferation that is locally infiltrative and has a high rate of recurrence but does not metastasize. This behavior places it in the \"Intermediate (Locally aggressive)\" category.",
+                source: "\"WHO 2020 Classification based on lineage of differentiation: ... Fibrous tissue Nodular fasciitis Fibromatosis Fibrosarcoma\" (The table classifies Fibromatosis in the \"Intermediate (Locally aggressive)\" column). (Soft Tissue Tumors, Slide 7)"
+            },
+            {
+                learningObjectiveShort: "LO 2a (Soft Tissue Tumors): Identify and differentiate core concepts in pathology, clinicopathologic correlation, and outcome of primary Lipogenic soft tissue tumors.",
+                learningObjectiveFull: "LO 2ai (Soft Tissue Tumors): Identify and differentiate core concepts in pathology, clinicopathologic correlation, and outcome of the following primary soft tissue tumors: Lipogenic – Lipoma",
+                question: "A 48-year-old woman presents for a routine physical examination. She notes a soft, painless, mobile lump on her upper back that has been present for several years without significant change. The mass is located in the subcutaneous tissue and measures approximately 4 cm. An excisional biopsy is performed. Which of the following is the most likely diagnosis?",
+                options: { A: "Liposarcoma", B: "Fibromatosis", C: "Lipoma", D: "Leiomyoma" },
+                correctAnswer: "C",
+                rationale: "A lipoma is the most common soft tissue tumor in adults and presents as a benign, slow-growing, painless, mobile, and subcutaneous mass, typically on the trunk or proximal extremities.",
+                source: "\"Most common soft tissue tumor of adults. Benign tumor of adipose tissue. Clinical: ... Subcutaneous; ... Slowly enlarging, painless\" (Soft Tissue Tumors, Slide 11)"
+            },
+            {
+                learningObjectiveShort: "LO 2a (Soft Tissue Tumors): Identify and differentiate core concepts in pathology, clinicopathologic correlation, and outcome of primary Lipogenic soft tissue tumors.",
+                learningObjectiveFull: "LO 2aii (Soft Tissue Tumors): Identify and differentiate core concepts in pathology, clinicopathologic correlation, and outcome of the following primary soft tissue tumors: Lipogenic – Liposarcoma",
+                question: "A 62-year-old man presents with a progressively enlarging, deep-seated mass in his proximal lower extremity. An MRI reveals a large, deep soft tissue mass measuring 8 cm. A biopsy is performed, and molecular analysis reveals amplification of the MDM2 gene. Which of the following is the most likely diagnosis?",
+                options: { A: "Myxoid Liposarcoma", B: "Well-differentiated Liposarcoma", C: "Rhabdomyosarcoma", D: "Synovial Sarcoma" },
+                correctAnswer: "B",
+                rationale: "Well-differentiated liposarcoma is a common subtype of liposarcoma, the most common soft tissue sarcoma in adults. It typically presents as a large, deep mass in the extremities or retroperitoneum and is characterized molecularly by MDM2 amplification.",
+                source: "\"Liposarcoma (LPS) Well-differentiated ... Molecular MDM2 amplification (12q)\" (Soft Tissue Tumors, Slide 13)"
+            },
+            {
+                learningObjectiveShort: "LO 2b (Soft Tissue Tumors): Identify and differentiate core concepts in pathology, clinicopathologic correlation, and outcome of primary Fibrogenic soft tissue tumors.",
+                learningObjectiveFull: "LO 2bi (Soft Tissue Tumors): Identify and differentiate core concepts in pathology, clinicopathologic correlation, and outcome of the following primary soft tissue tumors: Fibrogenic – Fibromatosis",
+                question: "A 19-year-old woman presents with a firm, painless mass in the anterior abdominal wall. She has a history of familial adenomatous polyposis. A biopsy of the mass reveals infiltrating fascicles of benign-appearing fibroblasts with abundant collagen. The lesion does not show metastatic potential. This patient's condition is most associated with a mutation in which of the following genes?",
+                options: { A: "SS18-SSX", B: "FUS-DDIT3", C: "CTNNB1 / β-catenin", D: "PAX3-FOXO" },
+                correctAnswer: "C",
+                rationale: "Deep fibromatosis, also known as a desmoid tumor, is a locally aggressive fibroblastic proliferation that does not metastasize. Its pathogenesis is linked to mutations in the CTNNB1 (β-catenin) gene, and it can be associated with Gardner syndrome (a variant of FAP).",
+                source: "\"Deep Fibromatosis (Desmoid Tumor) ... Pathogenesis: CTNNB1 / β-catenin mutation (germline - Gardner syndrome)\" (Soft Tissue Tumors, Slide 16)"
+            },
+            {
+                learningObjectiveShort: "LO 2c (Soft Tissue Tumors): Identify and differentiate core concepts in pathology, clinicopathologic correlation, and outcome of primary Myogenic (smooth muscle) soft tissue tumors.",
+                learningObjectiveFull: "LO 2ci (Soft Tissue Tumors): Identify and differentiate core concepts in pathology, clinicopathologic correlation, and outcome of the following primary soft tissue tumors: Myogenic (smooth muscle) – Leiomyoma",
+                question: "A 35-year-old woman presents to her gynecologist with complaints of heavy menstrual bleeding and pelvic pain. On physical examination, a firm, enlarged uterus is noted. An ultrasound confirms the presence of a well-circumscribed, whorled mass within the uterine wall. A biopsy is taken. Histopathology would most likely reveal which of the following?",
+                options: { A: "Spindle cells with cigar-shaped nuclei", B: "Rhabdomyoblasts with cross-striations", C: "Atypical stromal cells and lipoblasts", D: "Biphasic pattern of epithelial and spindle cells" },
+                correctAnswer: "A",
+                rationale: "Leiomyomas (\"fibroids\") are benign smooth muscle tumors that are extremely common in the uterus. Histologically, they are characterized by whorled fascicles of spindle cells with characteristic blunt-ended, cigar-shaped nuclei.",
+                source: "\"Leiomyoma ... Histopathology: Benign ... Whorled fascicles, Spindle cells, Cigar-shaped nuclei (blunt ends)\" (Soft Tissue Tumors, Slide 18)"
+            },
+            {
+                learningObjectiveShort: "LO 2c (Soft Tissue Tumors): Identify and differentiate core concepts in pathology, clinicopathologic correlation, and outcome of primary Myogenic (smooth muscle) soft tissue tumors.",
+                learningObjectiveFull: "LO 2cii (Soft Tissue Tumors): Identify and differentiate core concepts in pathology, clinicopathologic correlation, and outcome of the following primary soft tissue tumors: Myogenic (smooth muscle) – Leiomyosarcoma",
+                question: "A 65-year-old post-menopausal woman presents with abnormal uterine bleeding and a rapidly enlarging pelvic mass. A total hysterectomy is performed. The pathology report describes a malignant tumor arising de-novo within the uterine wall, characterized by intersecting fascicles of spindle cells with eosinophilic cytoplasm, pleomorphism, and a high mitotic rate. Which of the following is the most likely diagnosis?",
+                options: { A: "Leiomyoma", B: "Endometrial carcinoma", C: "Leiomyosarcoma", D: "Rhabdomyosarcoma" },
+                correctAnswer: "C",
+                rationale: "Leiomyosarcoma is a malignant tumor of smooth muscle that commonly affects post-menopausal women and arises de-novo (not from a pre-existing leiomyoma). Key histologic features include spindle cells with eosinophilic cytoplasm, pleomorphism, necrosis, and high mitotic activity.",
+                source: "\"Leiomyosarcoma ... >Females (post-menopausal) ... Arises de-novo (not from leiomyoma). Histopathology ... Spindle cells with eosinophilic cytoplasm, Cigar-shaped nuclei, Pleomorphism: moderate, Mitoses\" (Soft Tissue Tumors, Slide 19)"
+            },
+            {
+                learningObjectiveShort: "LO 2d (Soft Tissue Tumors): Identify and differentiate core concepts in pathology, clinicopathologic correlation, and outcome of primary Myogenic (skeletal muscle) soft tissue tumors.",
+                learningObjectiveFull: "LO 2di (Soft Tissue Tumors): Identify and differentiate core concepts in pathology, clinicopathologic correlation, and outcome of the following primary soft tissue tumors: Myogenic (skeletal muscle) – Rhabdomyoma",
+                question: "A 6-month-old infant is diagnosed with tuberous sclerosis after presenting with seizures. As part of the systemic workup, an echocardiogram is performed, which reveals a firm, white, circumscribed nodule in the wall of the left ventricle. Which of the following is the most likely diagnosis for the cardiac mass?",
+                options: { A: "Rhabdomyosarcoma", B: "Leiomyoma", C: "Fibroma", D: "Rhabdomyoma" },
+                correctAnswer: "D",
+                rationale: "Cardiac rhabdomyoma is a rare benign tumor of skeletal muscle that is most commonly seen in pediatric patients, particularly those with tuberous sclerosis.",
+                source: "\"Rhabdomyoma. Rare benign tumor. (a) Cardiac - Pediatric - Tuberous sclerosis\" (Soft Tissue Tumors, Slide 20)"
+            },
+            {
+                learningObjectiveShort: "LO 2d (Soft Tissue Tumors): Identify and differentiate core concepts in pathology, clinicopathologic correlation, and outcome of primary Myogenic (skeletal muscle) soft tissue tumors.",
+                learningObjectiveFull: "LO 2dii (Soft Tissue Tumors): Identify and differentiate core concepts in pathology, clinicopathologic correlation, and outcome of the following primary soft tissue tumors: Myogenic (skeletal muscle) – Rhabdomyosarcoma",
+                question: "A 4-year-old girl is brought to the pediatrician due to a mass protruding from the vagina. On examination, the mass has a \"grape-like\" appearance. A biopsy is taken, which shows a cambium layer and primitive rhabdomyoblasts, including strap cells. This tumor is the most common pediatric soft tissue sarcoma. Which of the following is the most likely diagnosis?",
+                options: { A: "Alveolar Rhabdomyosarcoma", B: "Embryonal Rhabdomyosarcoma", C: "Leiomyosarcoma", D: "Synovial Sarcoma" },
+                correctAnswer: "B",
+                rationale: "Embryonal rhabdomyosarcoma is the most common subtype, typically affecting children under 15. It often occurs in the head/neck and genitourinary regions. The \"sarcoma botryoides\" variant presents as a grape-like mass, and histology shows characteristic rhabdomyoblasts (strap, tadpole, spider cells).",
+                source: "\"Rhabdomyosarcoma. Most common pediatric soft tissue sarcoma ... Embryonal (60%) ... Age Pediatric (<15 yrs) ... Location Head-neck, Genito-urinary ... Gross Grape-like ... Histology - Cambium layer (Sarcoma botryoides) - Rhabdomyoblasts (strap, tadpole, spider cells)\" (Soft Tissue Tumors, Slide 21)"
+            },
+            {
+                learningObjectiveShort: "LO 2e (Soft Tissue Tumors): Identify and differentiate core concepts in pathology, clinicopathologic correlation, and outcome of primary soft tissue tumors of Uncertain differentiation.",
+                learningObjectiveFull: "LO 2ei (Soft Tissue Tumors): Identify and differentiate core concepts in pathology, clinicopathologic correlation, and outcome of the following primary soft tissue tumors: Uncertain differentiation – Synovial Sarcoma",
+                question: "A 25-year-old male presents with a painful, deep soft tissue mass around his knee that has been present for 6 months. An MRI confirms a deep-seated tumor. A biopsy is performed, and molecular studies reveal a characteristic t(X;18) translocation. Which of the following is the most likely diagnosis?",
+                options: { A: "Liposarcoma", B: "Rhabdomyosarcoma", C: "Synovial Sarcoma", D: "Fibromatosis" },
+                correctAnswer: "C",
+                rationale: "Synovial sarcoma is an aggressive soft tissue sarcoma that typically affects young and middle-aged adults, often occurring as a deep soft tissue mass around the knee. It is defined by the t(X;18) SS18-SSX fusion gene.",
+                source: "\"Synovial Sarcoma ... Age: 20-50 (Young and mid adults) ... Deep soft tissue ... Extremities: Mostly around knee joint (60-70%) ... Molecular: t(X;18) - SS18-SSX fusion\" (Soft Tissue Tumors, Slide 24)"
+            },
+            // Bone Tumors
+            {
+                learningObjective: "LO 1 (Bone Tumors): Identify basic anatomy and histology of bone relevant to tumors.",
+                question: "A pathologist is describing a bone biopsy from a patient with a suspected tumor. The report notes that the tumor is located in the flared portion of a long bone between the shaft and the growth plate. Which anatomical region of the bone is being described?",
+                options: { A: "Diaphysis", B: "Epiphysis", C: "Metaphysis", D: "Articular cartilage" },
+                correctAnswer: "C",
+                rationale: "The metaphysis is the region of a long bone located between the diaphysis (shaft) and the epiphysis (end), adjacent to the growth plate. It is a common location for many primary bone tumors.",
+                source: "(Image labeling the parts of a long bone, showing the metaphysis between the growth plate and the diaphysis). (Bone Tumors, Slide 4)"
+            },
+            {
+                learningObjective: "LO 1 (Bone Tumors): Identify basic anatomy and histology of bone relevant to tumors.",
+                question: "During the evaluation of a bone lesion, the pathologist observes that the malignant cells are directly producing a disorganized, lace-like extracellular substance. This substance is identified as immature, non-lamellar bone. What is this type of bone called?",
+                options: { A: "Lamellar bone", B: "Woven bone", C: "Cortical bone", D: "Trabecular bone" },
+                correctAnswer: "B",
+                rationale: "Woven bone is new, immature bone characterized by a haphazard organization of collagen fibers. It is seen in fetal development, fracture healing, and as the product of many bone-forming tumors, such as osteosarcoma.",
+                source: "\"Woven bone (new bone)\" (Image contrasting organized normal lamellar bone with disorganized woven bone). (Bone Tumors, Slide 5)"
+            },
+            {
+                learningObjective: "LO 1 (Bone Tumors): Identify basic anatomy and histology of bone relevant to tumors.",
+                question: "A bone biopsy from a lytic lesion shows numerous large, multinucleated cells residing in resorption pits on the surface of bone trabeculae. These cells are responsible for bone resorption and are a key feature in certain bone tumors. What is the identity of these cells?",
+                options: { A: "Osteoblasts", B: "Osteocytes", C: "Osteoclasts", D: "Chondrocytes" },
+                correctAnswer: "C",
+                rationale: "Osteoclasts are large, multinucleated cells responsible for bone resorption. They are often found in resorption lacunae (Howship's lacunae) and are prominent in tumors like giant cell tumor of bone.",
+                source: "\"Osteoclast (Howship resorption lacuna)\" (Image showing a large, multinucleated osteoclast in a resorption pit). (Bone Tumors, Slide 6)"
+            },
+            {
+                learningObjective: "LO 2 (Bone Tumors): Review the major classification (WHO 2020) of bone tumors and clinical pointers.",
+                question: "A 15-year-old male presents with bone pain. Imaging reveals a lesion, and a biopsy is performed. The pathology report describes a malignant tumor that is forming new bone (osteoid). According to the WHO 2020 classification, which histologic type does this tumor belong to?",
+                options: { A: "Chondrogenic", B: "Osteogenic", C: "Osteoclastic giant cell rich", D: "Undifferentiated round cell sarcoma" },
+                correctAnswer: "B",
+                rationale: "The WHO 2020 classification categorizes primary bone tumors by their cell of origin and the matrix they produce. Tumors that are characterized by the production of bone or osteoid, such as osteosarcoma, are classified as osteogenic.",
+                source: "\"WHO 2020 Classification of Primary Bone Tumors. Histologic Type ... Osteogenic (20%) ... Osteosarcoma\" (Bone Tumors, Slide 7)"
+            },
+            {
+                learningObjective: "LO 2 (Bone Tumors): Review the major classification (WHO 2020) of bone tumors and clinical pointers.",
+                question: "A 25-year-old patient is diagnosed with a locally aggressive tumor in the epiphysis of their distal femur. The tumor rarely metastasizes but is known for significant local bone destruction and recurrence. Based on the WHO 2020 classification, which category does this tumor best fit into?",
+                options: { A: "Benign", B: "Intermediate", C: "Malignant", D: "Hematopoietic" },
+                correctAnswer: "B",
+                rationale: "Giant cell tumor of bone is characterized by its locally aggressive nature and potential for recurrence, but low metastatic potential. The WHO classification places tumors with this behavior in the \"Intermediate (Locally aggressive +/- rarely metastasizing)\" category.",
+                source: "\"WHO 2020 Classification of Primary Bone Tumors ... Intermediate (Locally aggressive +/- rarely metastasizing) ... Giant cell tumor\" (Bone Tumors, Slide 7)"
+            },
+            {
+                learningObjective: "LO 2 (Bone Tumors): Review the major classification (WHO 2020) of bone tumors and clinical pointers.",
+                question: "A 70-year-old man presents with bone pain and a pathologic fracture. Workup reveals multiple lytic bone lesions throughout the axial skeleton. A bone marrow biopsy shows sheets of malignant plasma cells. While this is a primary tumor of bone, it is not classified with osteogenic or chondrogenic tumors. What is the most likely diagnosis?",
+                options: { A: "Osteosarcoma", B: "Chondrosarcoma", C: "Multiple myeloma", D: "Ewing sarcoma" },
+                correctAnswer: "C",
+                rationale: "Multiple myeloma is a malignant tumor of plasma cells that arises in the bone marrow. In the WHO classification, it falls under the \"Hematopoietic\" category of primary bone tumors, distinct from mesenchymal tumors like osteosarcoma.",
+                source: "\"WHO 2020 Classification of Primary Bone Tumors ... Hematopoietic (40%) ... Multiple myeloma\" (Bone Tumors, Slide 7)"
+            },
+            {
+                learningObjectiveShort: "LO 3a (Bone Tumors): Identify and differentiate core concepts in pathology, clinicopathologic correlation, and outcome of Osteogenic primary bone tumors.",
+                learningObjectiveFull: "LO 3a (Bone Tumors): Identify and differentiate core concepts in pathology, clinicopathologic correlation, and outcome of the following primary bone tumors: Osteogenic – Osteoid osteoma",
+                question: "A 19-year-old male presents with a several-month history of dull, aching pain in his right thigh that is significantly worse at night and consistently relieved by taking ibuprofen. A plain radiograph shows a small, radiolucent nidus in the cortex of the femoral diaphysis, surrounded by dense reactive sclerosis. Which of the following is the most likely diagnosis?",
+                options: { A: "Osteosarcoma", B: "Ewing sarcoma", C: "Osteoid osteoma", D: "Chondroblastoma" },
+                correctAnswer: "C",
+                rationale: "The clinical presentation of nocturnal pain that is disproportionate to the small size of the lesion and is characteristically relieved by NSAIDs or aspirin is classic for an osteoid osteoma. Radiographic findings of a cortical lesion with a central radiolucent nidus and extensive reactive sclerosis are also typical.",
+                source: "\"Osteoid Osteoma ... Clinical: Nocturnal pain; relieved by NSAIDs / aspirin. Location: Long bones (femur, tibia), diaphyseal. CT/XR: ... Central - radiolucent nidus (core) - Peripheral – reactive osteo-sclerosis\" (Bone Tumors, Slide 19)"
+            },
+            {
+                learningObjectiveShort: "LO 3a (Bone Tumors): Identify and differentiate core concepts in pathology, clinicopathologic correlation, and outcome of Osteogenic primary bone tumors.",
+                learningObjectiveFull: "LO 3a (Bone Tumors): Identify and differentiate core concepts in pathology, clinicopathologic correlation, and outcome of the following primary bone tumors: Osteogenic – Osteosarcoma",
+                question: "A 16-year-old boy presents with pain and swelling around his knee for the past two months. An X-ray of the distal femur reveals a large, destructive intramedullary lesion in the metaphysis with indistinct borders. The lesion shows mixed lytic and blastic areas, cortical destruction, a \"sunburst\" periosteal reaction, and elevation of the periosteum known as a Codman triangle. Which of the following is the most likely diagnosis?",
+                options: { A: "Giant cell tumor", B: "Osteosarcoma", C: "Ewing sarcoma", D: "Osteochondroma" },
+                correctAnswer: "B",
+                rationale: "Osteosarcoma is the most common primary malignant bone tumor, typically affecting adolescents in the metaphyseal region of long bones, especially around the knee. The classic radiographic findings of a destructive lesion with tumor matrix ossification, a sunburst periosteal reaction, and a Codman triangle are highly characteristic.",
+                source: "\"Primary Osteosarcoma ... Age / sex 10-30 ... Location Long bones: - Distal femur, proximal tibia (50% around knee) ... XR/CT/MR - Metaphysis ... - Sun-burst appearance (radial growth) - Periosteal elevation (Codman triangle)\" (Bone Tumors, Slide 21)"
+            },
+            {
+                learningObjectiveShort: "LO 3b (Bone Tumors): Identify and differentiate core concepts in pathology, clinicopathologic correlation, and outcome of Chondrogenic primary bone tumors.",
+                learningObjectiveFull: "LO 3b (Bone Tumors): Identify and differentiate core concepts in pathology, clinicopathologic correlation, and outcome of the following primary bone tumors: Chondrogenic – Osteochondroma",
+                question: "An 18-year-old male undergoes a knee X-ray for an unrelated sports injury. The radiologist notes an incidental finding on the distal femoral metaphysis: a bony projection with a cartilage cap, measuring 1.5 cm thick. The marrow space of the projection is continuous with the marrow space of the femur. The patient is asymptomatic. What is the most likely diagnosis?",
+                options: { A: "Chondrosarcoma", B: "Enchondroma", C: "Osteoid osteoma", D: "Osteochondroma" },
+                correctAnswer: "D",
+                rationale: "Osteochondroma is the most common benign bone tumor, often found incidentally in adolescents and young adults. It is characterized as an exophytic (outward-growing) bony mass with an overlying cartilage cap, typically located on the metaphysis of long bones. The continuity of the marrow space is a key diagnostic feature.",
+                source: "\"Osteochondroma (exostosis). Most common benign tumor of bone. Exophytic bony mass with overlying cartilage cap ... XR / CT: Exophytic; with a <2 cm thick cartilage cap. Metaphyseal. Marrow space continuous with bone\" (Bone Tumors, Slide 26)"
+            },
+            {
+                learningObjectiveShort: "LO 3b (Bone Tumors): Identify and differentiate core concepts in pathology, clinicopathologic correlation, and outcome of Chondrogenic primary bone tumors.",
+                learningObjectiveFull: "LO 3b (Bone Tumors): Identify and differentiate core concepts in pathology, clinicopathologic correlation, and outcome of the following primary bone tumors: Chondrogenic – Enchondroma",
+                question: "A 30-year-old woman presents with a pathologic fracture of her 4th metacarpal after a minor fall. An X-ray shows a well-circumscribed, lytic lesion in the medulla of the small bone with focal calcifications. A biopsy reveals a circumscribed nodule of benign hyaline cartilage. Which of the following is the most likely diagnosis?",
+                options: { A: "Osteochondroma", B: "Chondrosarcoma", C: "Enchondroma", D: "Giant cell tumor" },
+                correctAnswer: "C",
+                rationale: "Enchondromas are benign cartilaginous tumors that are commonly found in the medulla of the small bones of the hands and feet. They are typically asymptomatic unless they cause a pathologic fracture. Radiographically, they appear as a central, lytic lesion with possible calcifications.",
+                source: "\"Enchondroma ... Location: Small bones (hands/feet). Metaphysis of long bones. XR/CT: ... Central, symmetrical; lytic with focal calcifications\" (Bone Tumors, Slide 28)"
+            },
+            {
+                learningObjectiveShort: "LO 3b (Bone Tumors): Identify and differentiate core concepts in pathology, clinicopathologic correlation, and outcome of Chondrogenic primary bone tumors.",
+                learningObjectiveFull: "LO 3b (Bone Tumors): Identify and differentiate core concepts in pathology, clinicopathologic correlation, and outcome of the following primary bone tumors: Chondrogenic – Chondrosarcoma",
+                question: "A 60-year-old man presents with a deep, aching pain in his hip and an enlarging mass that has been progressing over the last year. An X-ray of the pelvis reveals a large, >5 cm lytic lesion with irregular \"popcorn-calcifications,\" cortical destruction, and an associated soft tissue mass. There is no periosteal reaction. A biopsy confirms a malignant cartilage-forming tumor. What is the most likely diagnosis?",
+                options: { A: "Osteosarcoma", B: "Metastatic carcinoma", C: "Chondrosarcoma", D: "Ewing sarcoma" },
+                correctAnswer: "C",
+                rationale: "Chondrosarcoma is a malignant tumor that produces cartilage. It typically affects older adults (>40 years) in the central skeleton (pelvis, proximal femur). Radiographic features include a large osteolytic lesion with characteristic popcorn-like or ring-and-arc calcifications, cortical destruction, and the absence of a significant periosteal reaction.",
+                source: "\"Chondrosarcoma ... Age / sex 40-70 ... Location Proximal femur, Pelvis ... XR/CT >5 cm. Irregularly osteolytic with popcorn-calcifications. Cortical destruction & soft tissue extension. No periosteal reaction\" (Bone Tumors, Slide 29)"
+            },
+            {
+                learningObjectiveShort: "LO 3c (Bone Tumors): Identify and differentiate core concepts in pathology, clinicopathologic correlation, and outcome of Other mesenchymal primary bone tumors.",
+                learningObjectiveFull: "LO 3c (Bone Tumors): Identify and differentiate core concepts in pathology, clinicopathologic correlation, and outcome of the following primary bone tumors: Other mesenchymal tumors – Fibrous dysplasia",
+                question: "A 14-year-old girl is evaluated for precocious puberty, café-au-lait spots on her skin, and a history of multiple bone fractures. Radiographs of her femur show an expansile intramedullary lesion with a \"ground glass\" opacity and a varus deformity of the proximal femur described as a \"Shepherd's crook.\" A biopsy would show irregular trabeculae of woven bone lined by fibroblasts. What is the most likely diagnosis?",
+                options: { A: "Osteofibrous dysplasia", B: "Fibrous dysplasia", C: "Non-ossifying fibroma", D: "Osteosarcoma" },
+                correctAnswer: "B",
+                rationale: "The triad of polyostotic fibrous dysplasia, café-au-lait spots, and precocious puberty constitutes McCune-Albright syndrome. The radiographic findings of a ground glass lesion and a Shepherd's crook deformity are classic for fibrous dysplasia.",
+                source: "\"Fibrous dysplasia (FD) ... Polyostotic (endocrine) [McCune-Albright synd.] ... Triad – 1. FD: deformity, pain, fracture 2. Café au lait spots 3. Precocious puberty\" (Bone Tumors, Slide 33) and \"Radiology: ... -Ground glass opacity ... -When present, varus deformity of proximal femur (Shepherd's crook) is diagnostic\" (Bone Tumors, Slide 34)"
+            },
+            {
+                learningObjectiveShort: "LO 3d (Bone Tumors): Identify and differentiate core concepts in pathology, clinicopathologic correlation, and outcome of Osteoclastic giant cell rich primary bone tumors.",
+                learningObjectiveFull: "LO 3d (Bone Tumors): Identify and differentiate core concepts in pathology, clinicopathologic correlation, and outcome of the following primary bone tumors: Osteoclastic giant cell rich tumors – Giant cell tumor of bone",
+                question: "A 28-year-old woman presents with pain and swelling in her knee. She is tender to palpation over the distal femur. An X-ray shows a lytic, expansile, eccentric lesion in the epiphysis that extends to the articular surface. The lesion has a \"soap-bubble\" appearance with a well-defined, non-sclerotic border. Which of the following is the most likely diagnosis?",
+                options: { A: "Chondroblastoma", B: "Aneurysmal bone cyst", C: "Giant cell tumor", D: "Osteosarcoma" },
+                correctAnswer: "C",
+                rationale: "Giant cell tumors are locally aggressive lesions that characteristically occur in the epiphysis of long bones in skeletally mature young adults (20-40 years). The radiographic appearance of an expansile, osteolytic, eccentric epiphyseal lesion with a \"soap-bubble\" appearance is classic.",
+                source: "\"Giant Cell Tumor. Epiphyseal lesion (in an adult patient with closed physes) ... Age / sex 20-40 ... XR / CT - Epiphysis extends to metaphysis, eccentric - Expansile intramedullary osteolytic +/- internal septae (Soap-bubble appearance) - Well-defined non-sclerotic border\" (Bone Tumors, Slide 36)"
+            },
+            {
+                learningObjectiveShort: "LO 3e (Bone Tumors): Identify and differentiate core concepts in pathology, clinicopathologic correlation, and outcome of Undifferentiated round cell sarcomas of bone & soft tissue.",
+                learningObjectiveFull: "LO 3e (Bone Tumors): Identify and differentiate core concepts in pathology, clinicopathologic correlation, and outcome of the following primary bone tumors: Undifferentiated round cell sarcomas of bone & soft tissue – Ewing sarcoma",
+                question: "A 12-year-old boy presents with pain, swelling, and warmth in his lower leg, accompanied by fever and an elevated ESR. An X-ray of the tibia shows a poorly defined, lytic lesion in the diaphysis with a permeative pattern of bone destruction and an aggressive, multi-laminated \"onion skinning\" periosteal reaction. A biopsy reveals sheets of monotonous small round blue cells. Which of the following is the most likely diagnosis?",
+                options: { A: "Osteomyelitis", B: "Osteosarcoma", C: "Ewing sarcoma", D: "Lymphoma of bone" },
+                correctAnswer: "C",
+                rationale: "Ewing sarcoma is the second most common pediatric malignant bone tumor. It classically presents in the diaphysis of long bones with systemic symptoms (fever, warmth) that can mimic infection (osteomyelitis). The \"onion skinning\" periosteal reaction and histology showing small round blue cells are characteristic features.",
+                source: "\"Ewing Sarcoma ... Age / sex 10-20 ... Clinical Swelling/mass, pain, warmth, fever (↑WBC, ↑ESR) (mimics osteomyelitis). Location Long bones (femur, tibia) ... XR / CT - Diaphysis - Poorly defined, lytic ... - Aggressive periosteal reaction (Onion skinning)\" (Bone Tumors, Slide 39)"
+            },
+            // Gluteal Region & Posterior Thigh
+            {
+                learningObjective: "LO 1 (Gluteal Region & Posterior Thigh): Examine and identify the bony landmarks, ligaments, surface projections, palpation points, and features of the pelvic bones and femur that are important for normal posture and locomotion.",
+                question: "A 45-year-old man falls directly onto his buttock. He experiences severe pain and is unable to bear weight. On examination, he has significant tenderness over the rough bony projection on the posteroinferior aspect of his ischium. This landmark serves as the origin for the hamstring muscles. Which bony landmark is most likely injured?",
+                options: { A: "Ischial spine", B: "Pubic tubercle", C: "Ischial tuberosity", D: "Greater trochanter" },
+                correctAnswer: "C",
+                rationale: "The ischial tuberosity is the large, rough bony prominence on the posteroinferior part of the ischium. It supports the body's weight when sitting and is the primary attachment site for the hamstring muscles.",
+                source: "\"Ischial Tuberosity – rough bony projection on the posteroinferior aspect of the ischium; origin of hamstring muscles... Weight is placed on the ischial tuberosity when seated.\" (Gluteal Region and Posterior Thigh_Handout, Page 2)"
+            },
+            {
+                learningObjective: "LO 1 (Gluteal Region & Posterior Thigh): Examine and identify the bony landmarks, ligaments, surface projections, palpation points, and features of the pelvic bones and femur that are important for normal posture and locomotion.",
+                question: "A patient presents with pelvic instability following a severe traumatic injury. The physician determines that the sacrospinous and sacrotuberous ligaments are torn. These two ligaments work together to convert the greater and lesser sciatic notches into foramina. The sacrospinous ligament attaches the sacrum to which bony landmark?",
+                options: { A: "Ischial tuberosity", B: "Iliac crest", C: "Ischial spine", D: "Pubic tubercle" },
+                correctAnswer: "C",
+                rationale: "The sacrospinous ligament is a key stabilizing ligament of the pelvis that extends from the sacrum and coccyx to the ischial spine. It helps define the boundaries of the greater and lesser sciatic foramina.",
+                source: "\"Sacrospinous ligament – extends between sacrum & ischial spine\" (Gluteal Region and Posterior Thigh_Handout, Page 3) and image showing attachment to the ischial spine (Gluteal Region & Posterior Thigh, Slide 8)."
+            },
+            {
+                learningObjective: "LO 1 (Gluteal Region & Posterior Thigh): Examine and identify the bony landmarks, ligaments, surface projections, palpation points, and features of the pelvic bones and femur that are important for normal posture and locomotion.",
+                question: "A 75-year-old woman with osteoporosis sustains a hip fracture after a fall. The fracture is located at the narrow portion connecting the head of the femur to the femoral shaft. This region is highly vulnerable to fracture and subsequent avascular necrosis. Which part of the femur has been fractured?",
+                options: { A: "Greater trochanter", B: "Lesser trochanter", C: "Neck", D: "Intertrochanteric crest" },
+                correctAnswer: "C",
+                rationale: "The neck of the femur is the constricted part just distal to the head that connects it to the shaft. It is the most common site of \"hip fractures\" in the elderly and is at risk for disruption of the blood supply, leading to avascular necrosis.",
+                source: "\"Neck – narrow portion connecting the head and shaft (most vulnerable to fractures and subsequent vascular necrosis secondary to injury to the medial femoral circumflex artery)\" (Gluteal Region and Posterior Thigh_Handout, Page 2)"
+            },
+            {
+                learningObjective: "LO 2 (Gluteal Region & Posterior Thigh): Identify the muscles of the gluteal region and relate these muscles to their roles in providing stability during locomotion. Explain the anatomical basis for a superior gluteal nerve injury and Trendelenburg gait.",
+                question: "A 65-year-old woman presents with a waddling gait. During physical examination, the physician asks her to stand on her right leg. When she does this, her left hip drops significantly. This finding, known as a positive Trendelenburg sign, indicates weakness of the hip abductor muscles. Which muscle is primarily responsible for stabilizing the pelvis and preventing the contralateral hip from dropping?",
+                options: { A: "Gluteus maximus", B: "Gluteus medius", C: "Piriformis", D: "Obturator internus" },
+                correctAnswer: "B",
+                rationale: "The gluteus medius (along with the gluteus minimus) is the primary abductor of the hip. When standing on one leg, it contracts to stabilize the pelvis and prevent the unsupported side from tilting downward. Weakness of this muscle leads to a positive Trendelenburg sign.",
+                source: "\"Gluteus Medius ... Action: hip abduction & medial rotation; stabilizes pelvis during gait & standing\" (Gluteal Region & Posterior Thigh, Slide 18)"
+            },
+            {
+                learningObjective: "LO 2 (Gluteal Region & Posterior Thigh): Identify the muscles of the gluteal region and relate these muscles to their roles in providing stability during locomotion. Explain the anatomical basis for a superior gluteal nerve injury and Trendelenburg gait.",
+                question: "A patient undergoes hip replacement surgery through a posterior approach. Post-operatively, the patient has profound weakness in hip extension and has difficulty rising from a seated position and climbing stairs. Which nerve was most likely injured during the procedure?",
+                options: { A: "Superior gluteal nerve", B: "Inferior gluteal nerve", C: "Sciatic nerve", D: "Femoral nerve" },
+                correctAnswer: "B",
+                rationale: "The inferior gluteal nerve provides the sole motor innervation to the gluteus maximus muscle. The gluteus maximus is the most powerful extensor of the hip, essential for actions like rising from a chair, climbing stairs, and running.",
+                source: "\"Gluteus Maximus ... Action: hip extension & lateral rotation ... Innervation: inferior gluteal nerve\" (Gluteal Region & Posterior Thigh, Slide 13)"
+            },
+            {
+                learningObjective: "LO 2 (Gluteal Region & Posterior Thigh): Identify the muscles of the gluteal region and relate these muscles to their roles in providing stability during locomotion. Explain the anatomical basis for a superior gluteal nerve injury and Trendelenburg gait.",
+                question: "A 50-year-old man receives an improperly placed intramuscular injection in the gluteal region. Following the injection, he develops a Trendelenburg gait. The nerve that innervates the gluteus medius and minimus muscles was likely damaged. This nerve exits the pelvis through the greater sciatic foramen in what relation to the piriformis muscle?",
+                options: { A: "Inferior to the piriformis", B: "Superior to the piriformis", C: "Anterior to the piriformis", D: "Through the piriformis" },
+                correctAnswer: "B",
+                rationale: "The superior gluteal nerve, which innervates the gluteus medius and minimus (the primary hip abductors), exits the pelvis via the greater sciatic foramen, passing superior to the piriformis muscle. Injury to this nerve leads to weakness of these muscles and a subsequent Trendelenburg gait.",
+                source: "\"Superior Gluteal Nerve & Artery ... Both: Nerve & artery exit pelvis via greater sciatic foramen, superior to piriformis\" (Gluteal Region & Posterior Thigh, Slide 33)"
+            },
+            {
+                learningObjective: "LO 3 (Gluteal Region & Posterior Thigh): Identify the neurovascular structures that enter the gluteal region from the pelvic cavity via the greater or lesser sciatic foramina. Recognize the importance of the piriformis muscle as a reference for gluteal neurovascular structures.",
+                question: "A trauma patient sustains a pelvic fracture that injures structures passing through the greater sciatic foramen inferior to the piriformis muscle. In addition to the sciatic nerve, which of the following nerves would most likely be affected?",
+                options: { A: "Superior gluteal nerve", B: "Obturator nerve", C: "Inferior gluteal nerve", D: "Femoral nerve" },
+                correctAnswer: "C",
+                rationale: "The piriformis muscle is the key landmark for organizing the neurovascular structures exiting the greater sciatic foramen. The inferior gluteal nerve, along with the sciatic nerve, posterior cutaneous nerve of the thigh, pudendal nerve, and others, exits the pelvis by passing inferior to the piriformis.",
+                source: "\"The inferior gluteal vessels & nerve, sciatic nerve, posterior cutaneous nerve of the thigh, and nerve to the quadratus femoris exit the pelvis through the greater sciatic foramen by passing inferior to the piriformis.\" (Gluteal Region and Posterior Thigh_Handout, Page 3)"
+            },
+            {
+                learningObjective: "LO 3 (Gluteal Region & Posterior Thigh): Identify the neurovascular structures that enter the gluteal region from the pelvic cavity via the greater or lesser sciatic foramina. Recognize the importance of the piriformis muscle as a reference for gluteal neurovascular structures.",
+                question: "A patient is diagnosed with piriformis syndrome, where the sciatic nerve is compressed by an inflamed or spasming piriformis muscle. The sciatic nerve originates from the sacral plexus and is composed of which two nerves bundled in a common sheath?",
+                options: { A: "Tibial and common fibular nerves", B: "Superior and inferior gluteal nerves", C: "Obturator and femoral nerves", D: "Pudendal and tibial nerves" },
+                correctAnswer: "A",
+                rationale: "The sciatic nerve is the largest nerve in the body and is formed from the anterior rami of L4-S3. It is functionally composed of two distinct nerves, the tibial nerve and the common fibular nerve, which are bundled together and travel down the posterior thigh before separating.",
+                source: "\"Sciatic Nerve ... Composed of two nerves • Tibial nerve • Common fibular nerve\" (Gluteal Region & Posterior Thigh, Slide 38)"
+            },
+            {
+                learningObjective: "LO 3 (Gluteal Region & Posterior Thigh): Identify the neurovascular structures that enter the gluteal region from the pelvic cavity via the greater or lesser sciatic foramina. Recognize the importance of the piriformis muscle as a reference for gluteal neurovascular structures.",
+                question: "A cyclist presents with perineal numbness and pain after a long-distance ride. The symptoms are likely due to compression of the pudendal nerve. This nerve exits the pelvis through the greater sciatic foramen, passes around the ischial spine, and re-enters the perineum through which opening?",
+                options: { A: "Obturator canal", B: "Lesser sciatic foramen", C: "Superior pubic ramus", D: "Sacral hiatus" },
+                correctAnswer: "B",
+                rationale: "The pudendal nerve and internal pudendal vessels follow a unique path. They exit the pelvic cavity via the greater sciatic foramen (inferior to piriformis), and then immediately re-enter the pelvis to access the perineum by passing through the lesser sciatic foramen.",
+                source: "\"The internal pudendal vessels, pudendal nerve, and nerve to obturator internus exit the pelvis via the greater sciatic foramen, then re-enter the perineum through the lesser sciatic foramen.\" (Gluteal Region and Posterior Thigh_Handout, Page 3)"
+            },
+            {
+                learningObjective: "LO 4 (Gluteal Region & Posterior Thigh): Identify the muscles of the posterior thigh and describe the anatomical basis of hamstring injuries including avulsion fractures of the ischial tuberosity. Relate these muscles to the boundaries of the popliteal fossa, the neurovascular structures located within the fossa, and how to take a popliteal pulse.",
+                question: "A 20-year-old sprinter suddenly pulls up during a race, grabbing the back of his thigh in pain. He reports a \"pop\" and has significant weakness in hip extension and knee flexion. An MRI confirms a tear of the myotendinous junction of a hamstring muscle. All of the hamstring muscles originate from a common bony landmark except for which of the following?",
+                options: { A: "Long head of the biceps femoris", B: "Short head of the biceps femoris", C: "Semitendinosus", D: "Semimembranosus" },
+                correctAnswer: "B",
+                rationale: "The hamstring muscles consist of the biceps femoris (long and short heads), semitendinosus, and semimembranosus. All of these originate from the ischial tuberosity except for the short head of the biceps femoris, which originates from the linea aspera of the femur. Therefore, the short head only acts on the knee, not the hip.",
+                source: "\"Biceps Femoris. Proximal attachment: • Long head: ischial tuberosity • Short head: linea aspera\" (Gluteal Region & Posterior Thigh, Slide 26)"
+            },
+            {
+                learningObjective: "LO 4 (Gluteal Region & Posterior Thigh): Identify the muscles of the posterior thigh and describe the anatomical basis of hamstring injuries including avulsion fractures of the ischial tuberosity. Relate these muscles to the boundaries of the popliteal fossa, the neurovascular structures located within the fossa, and how to take a popliteal pulse.",
+                question: "A physician is attempting to palpate the popliteal pulse on a patient. This pulse can be difficult to find as the artery is the deepest structure in its fossa. The popliteal fossa is a diamond-shaped space on the posterior aspect of the knee. Which structures form the superomedial boundary of this fossa?",
+                options: { A: "Tendon of biceps femoris", B: "Medial and lateral heads of the gastrocnemius", C: "Tendons of semimembranosus and semitendinosus", D: "Tendon of plantaris" },
+                correctAnswer: "C",
+                rationale: "The boundaries of the popliteal fossa are formed by hamstring tendons superiorly and the heads of the gastrocnemius inferiorly. The superomedial border is formed by the tendons of the semimembranosus and semitendinosus muscles.",
+                source: "\"Boundaries: ... 2. Semimembranosus and semitendinosus tendons (superomedially)\" (Gluteal Region and Posterior Thigh_Handout, Page 5) and image showing boundaries (Gluteal Region & Posterior Thigh, Slide 47)."
+            },
+            {
+                learningObjective: "LO 4 (Gluteal Region & Posterior Thigh): Identify the muscles of the posterior thigh and describe the anatomical basis of hamstring injuries including avulsion fractures of the ischial tuberosity. Relate these muscles to the boundaries of the popliteal fossa, the neurovascular structures located within the fossa, and how to take a popliteal pulse.",
+                question: "A patient suffers a posterior knee dislocation, and there is concern for injury to the neurovascular structures within the popliteal fossa. From superficial to deep, what is the correct arrangement of the main nerve, vein, and artery in the central part of the fossa?",
+                options: { A: "Artery, Vein, Nerve", B: "Nerve, Artery, Vein", C: "Vein, Nerve, Artery", D: "Nerve, Vein, Artery" },
+                correctAnswer: "D",
+                rationale: "The contents of the popliteal fossa are arranged with the nerve (tibial nerve, a branch of the sciatic) being most superficial, followed by the popliteal vein, and then the popliteal artery lying deepest, directly on the femur.",
+                source: "\"Popliteal Artery ... deepest structure in the popliteal fossa\" and \"Popliteal Vein ... Lies superficial to and in the same fibrous sheath as the popliteal artery\" and \"Nerves in the Popliteal Fossa: Tibial nerve and common fibular (peroneal) nerve – branch from the sciatic nerve just superior to the popliteal fossa\" (The relative positions are described, establishing the N-V-A order from superficial to deep). (Gluteal Region and Posterior Thigh_Handout, Page 5)"
+            },
+            {
+                learningObjective: "LO 5 (Gluteal Region & Posterior Thigh): Identify anatomical structures associated with the gluteal region and posterior thigh on X-Rays, MRI, and CT scans.",
+                question: "A 16-year-old soccer player experiences a sudden, forceful contraction of the hamstring muscles while kicking a ball, resulting in a \"pop\" and intense pain in the buttock. An anteroposterior radiograph of the pelvis is obtained. An avulsion fracture would most likely be seen at which of the following locations?",
+                options: { A: "Greater trochanter", B: "Ischial tuberosity", C: "Anterior superior iliac spine", D: "Lesser trochanter" },
+                correctAnswer: "B",
+                rationale: "Hamstring injuries can be severe enough to cause an avulsion fracture, where the tendon pulls a piece of bone away from its attachment site. Since the proximal hamstrings attach to the ischial tuberosity, this is the site of avulsion. This is particularly true in skeletally immature individuals where the apophysis has not yet fused.",
+                source: "\"Most severe form is an avulsion injury. • Osseous avulsion at the apophysis of the ischial tuberosity in skeletally immature.\" (Image showing an X-ray of an ischial tuberosity avulsion fracture). (Gluteal Region & Posterior Thigh, Slide 29)"
+            },
+            {
+                learningObjective: "LO 5 (Gluteal Region & Posterior Thigh): Identify anatomical structures associated with the gluteal region and posterior thigh on X-Rays, MRI, and CT scans.",
+                question: "A 45-year-old woman with a history of gluteal tendinopathy presents with chronic lateral hip pain, consistent with Greater Trochanteric Pain Syndrome. An MRI of the hip is ordered to evaluate the soft tissues. The tendons of which two muscles, which insert on the greater trochanter, are most likely to show signs of tendinopathy?",
+                options: { A: "Gluteus maximus and piriformis", B: "Gluteus medius and gluteus minimus", C: "Obturator internus and quadratus femoris", D: "Tensor fasciae latae and sartorius" },
+                correctAnswer: "B",
+                rationale: "Greater Trochanteric Pain Syndrome is most commonly caused by tendinopathy of the gluteus medius and minimus muscles at their insertion point on the greater trochanter of the femur, rather than bursitis as was historically thought.",
+                source: "\"Greater Trochanteric Pain Syndrome ... Gluteal tendinopathy (medius & minimus) is most common cause.\" (Image showing an MRI with signal change near the greater trochanter). (Gluteal Region & Posterior Thigh, Slide 20)"
+            },
+            {
+                learningObjective: "LO 5 (Gluteal Region & Posterior Thigh): Identify anatomical structures associated with the gluteal region and posterior thigh on X-Rays, MRI, and CT scans.",
+                question: "A 28-year-old long-distance runner presents with persistent lateral thigh pain. An MRI is performed to rule out a soft tissue injury. The images show inflammation at the myotendinous junction of the long head of the biceps femoris. Which of the following images best depicts this injury?",
+                options: { A: "Image of an avulsion fracture at the ischial tuberosity", B: "Image of a dislocated hip", C: "Coronal and axial MRI images showing high signal intensity (edema) in the muscle belly", D: "Anteroposterior radiograph of the knee" },
+                correctAnswer: "C",
+                rationale: "MRI is the imaging modality of choice for soft tissue injuries like hamstring strains. An acute injury to the myotendinous junction would appear as high signal intensity (white) on fluid-sensitive sequences (like T2-weighted images), indicating edema and inflammation.",
+                source: "(Image labeled \"Injury to myotendinous junction of the long head of the biceps femoris\" shows coronal and axial MRI scans with clear high-signal edema in the muscle). (Gluteal Region & Posterior Thigh, Slide 28)"
+            }
+        ];
+
+        const quizContainer = document.getElementById('quiz-container');
+        const themeToggleButton = document.getElementById('theme-toggle-button');
+        const bodyElement = document.body;
+
+        function applyTheme(theme) {
+            if (theme === 'light') {
+                bodyElement.classList.add('light-theme');
+                themeToggleButton.textContent = 'Switch to Dark Mode';
+            } else {
+                bodyElement.classList.remove('light-theme');
+                themeToggleButton.textContent = 'Switch to Light Mode';
+            }
+            localStorage.setItem('quizTheme', theme);
+        }
+
+        function loadQuiz() {
+            quizData.forEach((qData, index) => {
+                const questionBlock = document.createElement('div');
+                questionBlock.classList.add('question-block');
+                questionBlock.id = `q${index}`;
+
+                const loText = document.createElement('div');
+                loText.classList.add('learning-objective');
+                loText.id = `lo-${index}`;
+                loText.textContent = qData.learningObjectiveShort || qData.learningObjective;
+                questionBlock.appendChild(loText);
+
+                const questionText = document.createElement('p');
+                questionText.classList.add('question-text');
+                questionText.innerHTML = `${index + 1}. ${qData.question}`;
+                questionBlock.appendChild(questionText);
+
+                const optionsDiv = document.createElement('div');
+                optionsDiv.classList.add('options');
+
+                for (const optionKey in qData.options) {
+                    const optionId = `q${index}_${optionKey}`;
+                    const label = document.createElement('label');
+                    label.htmlFor = optionId;
+
+                    const radioInput = document.createElement('input');
+                    radioInput.type = 'radio';
+                    radioInput.name = `q${index}`;
+                    radioInput.value = optionKey;
+                    radioInput.id = optionId;
+
+                    const labelText = document.createElement('span');
+                    labelText.textContent = ` ${optionKey}. ${qData.options[optionKey]}`;
+
+                    label.appendChild(radioInput);
+                    label.appendChild(labelText);
+                    optionsDiv.appendChild(label);
+                }
+                questionBlock.appendChild(optionsDiv);
+
+                const buttonContainer = document.createElement('div');
+                buttonContainer.classList.add('button-container');
+
+                const checkButton = document.createElement('button');
+                checkButton.textContent = 'Check Answer';
+                checkButton.classList.add('check-button');
+                checkButton.onclick = () => checkAnswer(index);
+                buttonContainer.appendChild(checkButton);
+
+                questionBlock.appendChild(buttonContainer);
+
+                const feedbackDiv = document.createElement('div');
+                feedbackDiv.classList.add('feedback');
+                questionBlock.appendChild(feedbackDiv);
+
+                quizContainer.appendChild(questionBlock);
+            });
+        }
+
+        function checkAnswer(questionIndex) {
+            const questionBlockElement = document.getElementById(`q${questionIndex}`);
+            const selectedRadioButton = questionBlockElement.querySelector('input[type="radio"]:checked');
+
+            if (!selectedRadioButton) {
+                alert("Please select an answer first.");
+                return;
+            }
+
+            const selectedOptionKey = selectedRadioButton.value;
+            const qData = quizData[questionIndex];
+            const feedbackDiv = questionBlockElement.querySelector('.feedback');
+            const loElement = document.getElementById(`lo-${questionIndex}`);
+
+            // Update the learning objective text to the full version, if it exists
+            if (qData.learningObjectiveFull) {
+                loElement.textContent = qData.learningObjectiveFull;
+            }
+
+            const correct = selectedOptionKey === qData.correctAnswer;
+
+            let feedbackHTML = '';
+            if (correct) {
+                feedbackHTML = `<span class="feedback-status">Correct!</span>`;
+                feedbackDiv.className = 'feedback correct';
+            } else {
+                feedbackHTML = `<span class="feedback-status">Incorrect. The correct answer is ${qData.correctAnswer}.</span>`;
+                feedbackDiv.className = 'feedback incorrect';
+            }
+
+            feedbackHTML += `<div class="feedback-rationale"><strong>Rationale:</strong> ${qData.rationale}</div>`;
+            feedbackHTML += `<div class="feedback-source"><strong>Source:</strong> ${qData.source}</div>`;
+
+            feedbackDiv.innerHTML = feedbackHTML;
+        }
+
+        themeToggleButton.addEventListener('click', () => {
+            if (bodyElement.classList.contains('light-theme')) {
+                applyTheme('dark');
+            } else {
+                applyTheme('light');
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('quizTheme') || 'dark';
+            applyTheme(savedTheme);
+            loadQuiz();
+        });
+    </script>
+</body>
+</html>
